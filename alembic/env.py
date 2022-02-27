@@ -15,7 +15,7 @@ fileConfig(config.config_file_name)
 
 from short_links import config as config_env
 from short_links.db import Base
-from short_links.links.models import Link
+from short_links.links.models import Link, Stat
 
 # add your model's MetaData object here
 # for 'autogenerate' support

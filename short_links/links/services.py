@@ -22,15 +22,29 @@ async def create_new_links(original_url: str, database: Session) -> models.Link:
       original_url=original_url,
       expiration_date=datetime.now() + timedelta(days=30)
     )
+    stat = models.Stat(link=new_link)
     database.add(new_link)
+    database.add(stat)
     database.commit()
     database.refresh(new_link)
     return new_link
 
 async def get_link_by_short_link_id(short_link_id: str, database: Session) -> Optional[models.Link]:
     link = database.query(models.Link).filter_by(short_link_id=short_link_id).first()
+    
     if link is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND
         )
+    return link
+
+async def get_link_and_update_click(short_link_id: str, database: Session) -> Optional[models.Link]:
+    link = database.query(models.Link).filter_by(short_link_id=short_link_id).first()
+    
+    if link is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+    link.stat.clicks += 1
+    database.commit()
     return link
